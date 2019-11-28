@@ -9,6 +9,15 @@ LABEL maintainer="Luka Kosenina <luka.kosenina@outlook.com>"
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+# Build Args
+ARG LOG_DIR=/app/logs
+
+# Create Log Directory
+RUN mkdir -p ${LOG_DIR}
+
+# Environment Variables
+ENV LOG_FILE_LOCATION=${LOG_DIR}/app.log 
+
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
@@ -23,6 +32,9 @@ RUN go build -o ad-mediation .
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
+
+# Declare volumes to mount
+VOLUME [${LOG_DIR}]
 
 # Command to run the executable
 CMD ["./ad-mediation"]
