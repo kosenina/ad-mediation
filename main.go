@@ -8,6 +8,7 @@ import (
 	"github.com/kosenina/ad-mediation/adding"
 	"github.com/kosenina/ad-mediation/listing"
 	"github.com/kosenina/ad-mediation/models"
+	"github.com/kosenina/ad-mediation/objectcache"
 	"github.com/kosenina/ad-mediation/storage"
 	"github.com/kosenina/ad-mediation/utils"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -55,8 +56,12 @@ func main() {
 		log.Println("Ping to DB was successfull.")
 	}
 
+	// Initialize cache
+	var cache objectcache.ObjectCache
+	cache = objectcache.NewInMemoryCache()
+
 	// Create the available services
-	lister := listing.NewService(dbStorage)
+	lister := listing.NewService(dbStorage, cache)
 	adder := adding.NewService(dbStorage)
 
 	router := mux.NewRouter()
