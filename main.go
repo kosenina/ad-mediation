@@ -24,6 +24,7 @@ func main() {
 
 	confStorageType := utils.GetEnv("PERSISTENT_STORAGE", "MongoDB")
 
+	// Initialize service storage
 	switch confStorageType {
 	case "MongoDB":
 		dbStorage, _ = storage.NewMongoDBStorage()
@@ -31,7 +32,13 @@ func main() {
 		log.Fatal("Not implemented")
 	}
 
-	// create the available services
+	// Check if storage is up and running
+	pingErr := dbStorage.Ping()
+	if pingErr != nil {
+		log.Fatal("Failed to ping DB.", pingErr)
+	}
+
+	// Create the available services
 	lister := listing.NewService(dbStorage)
 	adder := adding.NewService(dbStorage)
 

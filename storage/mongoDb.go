@@ -87,3 +87,9 @@ func (repo *MongoDBStorage) Upsert(data models.AdNetworkList) error {
 	}
 	return models.ErrUpsertFailed
 }
+
+// Ping checks if MongoDB is up and runing
+func (repo *MongoDBStorage) Ping() error {
+	err := repo.db.Client().Ping(context.TODO(), nil)
+	return err
+}

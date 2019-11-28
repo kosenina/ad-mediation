@@ -48,4 +48,6 @@ type Repository interface {
 	Get() (AdNetworkList, error)
 	// Add saves an ad network into the DB.
 	Upsert(AdNetworkList) error
+	// Checks if DB provider is working
+	Ping() error
 }
