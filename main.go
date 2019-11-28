@@ -62,7 +62,7 @@ func main() {
 
 	// Create the available services
 	lister := listing.NewService(dbStorage, cache)
-	adder := adding.NewService(dbStorage)
+	adder := adding.NewService(dbStorage, cache)
 
 	router := mux.NewRouter()
 	api := router.PathPrefix("/api/v1").Subrouter()
