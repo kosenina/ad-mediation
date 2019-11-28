@@ -23,23 +23,23 @@ func MakePutAdNetworkListingEndpoint(s Service) func(w http.ResponseWriter, r *h
 		var newAdNetworkList models.AdNetworkList
 		var err = json.Unmarshal(reqBody, &newAdNetworkList)
 		if err != nil {
-			log.Println("Failed to unmarshal request body.", err)
+			log.Println("ERROR: Failed to unmarshal request body.", err)
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"message": "Invalid request body."}`))
+			w.Write([]byte(`{"errorMessage": "Invalid request body."}`))
 			return
 		}
 
 		// Check if provided data is valid
 		if newAdNetworkList.IsValid() == false {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"message": "List of AdNetwork items is not valid."}`))
+			w.Write([]byte(`{"errorMessage": "List of AdNetwork items is not valid."}`))
 			return
 		}
 
 		upsertErr := s.UpsertAdNetworkList(newAdNetworkList)
 		if upsertErr != nil {
 			w.WriteHeader(http.StatusNotModified)
-			w.Write([]byte(`{"message": "Ad network list was not updated."}`))
+			w.Write([]byte(`{"errorMessage": "Ad network list was not updated."}`))
 		}
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte(`{"message": "Ad network list successfully updated."}`))

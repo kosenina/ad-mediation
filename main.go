@@ -33,7 +33,7 @@ func main() {
 		})
 	}
 
-	log.Println("Starting Server")
+	log.Println("INFO: Starting Server")
 
 	// Prepare repository
 	var dbStorage models.Repository
@@ -51,9 +51,9 @@ func main() {
 	// Check if storage is up and running
 	pingErr := dbStorage.Ping()
 	if pingErr != nil {
-		log.Fatal("Failed to ping DB.", pingErr)
+		log.Fatal("ERROR: Failed to ping DB.", pingErr)
 	} else {
-		log.Println("Ping to DB was successfull.")
+		log.Println("INFO: Ping to DB was successfull.")
 	}
 
 	// Initialize cache
@@ -69,6 +69,6 @@ func main() {
 	api.HandleFunc("/adNetworkList", listing.MakeGetAdNetworkListingEndpoint(lister)).Methods(http.MethodGet)
 	api.HandleFunc("/adNetworkList", adding.MakePutAdNetworkListingEndpoint(adder)).Methods(http.MethodPut)
 	api.HandleFunc("/adNetworkList", notFound)
-	log.Println("Server is up and running!")
+	log.Println("INFO: Server is up and running!")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

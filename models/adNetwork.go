@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // AdNetwork metadata
 type AdNetwork struct {
 	Name string `json:"name"`
@@ -8,7 +10,9 @@ type AdNetwork struct {
 
 // AdNetworkList list of AdNetworks
 type AdNetworkList struct {
-	Items []AdNetwork `json:"items"`
+	ID      string      `json:"_id" bson:"_id"`
+	Items   []AdNetwork `json:"items"`
+	Created time.Time   `json:"created"`
 }
 
 // IsValid check wether object data is correct
@@ -45,7 +49,7 @@ func (a AdNetworkList) IsValid() bool {
 // Repository provides access to the ad network storage.
 type Repository interface {
 	// Get returns ad network saved in DB.
-	Get() (AdNetworkList, error)
+	Get(string) (AdNetworkList, error)
 	// Add saves an ad network into the DB.
 	Upsert(AdNetworkList) error
 	// Checks if DB provider is working
