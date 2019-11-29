@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/kosenina/ad-mediation/adding"
 	"github.com/kosenina/ad-mediation/listing"
 	"github.com/kosenina/ad-mediation/models"
@@ -65,11 +65,22 @@ func main() {
 	lister := listing.NewService(dbStorage, cache)
 	adder := adding.NewService(dbStorage, cache)
 
-	router := mux.NewRouter()
-	api := router.PathPrefix("/api/v1").Subrouter()
-	api.HandleFunc("/adNetworkList", listing.MakeGetAdNetworkListingEndpoint(lister)).Methods(http.MethodGet)
-	api.HandleFunc("/adNetworkList", adding.MakePutAdNetworkListingEndpoint(adder)).Methods(http.MethodPut)
-	api.HandleFunc("/adNetworkList", notFound)
+	// Set the router as the default one shipped with Gin
+	router := gin.Default()
+
+	// Setup route group for the API
+	ginAPI := router.Group("/api/v1")
+	{
+		ginAPI.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
+	}
+	ginAPI.GET("/adNetworkList", listing.MakeGetAdNetworkListingEndpoint(lister))
+	ginAPI.PUT("/adNetworkList", adding.MakePutAdNetworkListingEndpoint(adder))
+
+	// Start and run the server
 	log.Println("INFO: Server is up and running!")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(router.Run(":8080"))
 }
