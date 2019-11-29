@@ -13,6 +13,14 @@ import (
 type Handler func(c *gin.Context)
 
 // MakePutAdNetworkListingEndpoint creates a handler for PUT /adNetworkList requests
+// @Summary Upsert ad network list
+// @Description Update or insert ad network list for today
+// @Tags adNetworkList
+// @Accept  json
+// @Produce  json
+// @Param  data body models.AdNetworkList true "Upsert ad network list"
+// @Success 200
+// @Router /adNetworkList [put]
 func MakePutAdNetworkListingEndpoint(s Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.Header("Content-Type", "application/json")

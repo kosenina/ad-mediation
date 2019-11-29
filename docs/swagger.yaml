@@ -1,0 +1,72 @@
+basePath: /api/v1
+definitions:
+  models.AdNetwork:
+    properties:
+      name:
+        type: string
+      rank:
+        type: integer
+    type: object
+  models.AdNetworkList:
+    properties:
+      _id:
+        type: string
+      created:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/models.AdNetwork'
+        type: array
+    type: object
+info:
+  contact:
+    email: luka.kosenina@outlook.com
+    name: API Support
+  description: Swagger API for Golang Project Ad Mediation.
+  license: {}
+  termsOfService: http://swagger.io/terms/
+  title: Ad Mediation Swagger API
+  version: "1.0"
+paths:
+  /adNetworkList:
+    get:
+      consumes:
+      - application/json
+      description: get ad network list for queried time, current (for today) ad network
+        list is returned if parameter is not provided
+      parameters:
+      - description: provide time to fetch list of ad newtworks for specified time
+        format: date
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AdNetworkList'
+      summary: Get ad network list
+      tags:
+      - adNetworkList
+    put:
+      consumes:
+      - application/json
+      description: Update or insert ad network list for today
+      parameters:
+      - description: Upsert ad network list
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdNetworkList'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200": {}
+      summary: Upsert ad network list
+      tags:
+      - adNetworkList
+swagger: "2.0"

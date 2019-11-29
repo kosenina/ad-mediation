@@ -14,6 +14,14 @@ import (
 type Handler func(c *gin.Context)
 
 // MakeGetAdNetworkListingEndpoint creates a handler for GET /adNetworkList requests
+// @Summary Get ad network list
+// @Description get ad network list for queried time, current (for today) ad network list is returned if parameter is not provided
+// @Tags adNetworkList
+// @Accept  json
+// @Produce  json
+// @Param date query string false "provide time to fetch list of ad newtworks for specified time" Format(date)
+// @Success 200 {object} models.AdNetworkList
+// @Router /adNetworkList [get]
 func MakeGetAdNetworkListingEndpoint(s Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		c.Header("Content-Type", "application/json")
