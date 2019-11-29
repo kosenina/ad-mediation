@@ -19,8 +19,6 @@ const (
 	mongoURL       = "localhost:27017"
 	databaseName   = "adMediation"
 	collectionName = "adNetworks"
-
-	adNetworksListID = "outfit7AdNetworks"
 )
 
 var mongoDB *mongo.Database = nil
@@ -31,7 +29,7 @@ type MongoDBStorage struct {
 }
 
 // NewMongoDBStorage returns a MongoDB storage implementation
-func NewMongoDBStorage() (*MongoDBStorage, error) {
+func NewMongoDBStorage() *MongoDBStorage {
 	var err error
 
 	s := new(MongoDBStorage)
@@ -44,13 +42,15 @@ func NewMongoDBStorage() (*MongoDBStorage, error) {
 			log.Fatal("ERROR: Failed to connect to MongoDB", err)
 		}
 	}
-	return s, nil
+	return s
 }
 
 // Creates MongoDB client (is safe to use concurrently)
 func getMongoDatabase() (*mongo.Database, error) {
 	var mux sync.Mutex
 	mux.Lock()
+	defer mux.Unlock()
+
 	if mongoDB != nil {
 		return mongoDB, nil
 	}
@@ -81,7 +81,6 @@ func getMongoDatabase() (*mongo.Database, error) {
 		log.Printf("INFO: Created MongoDB index: %s", ind)
 	}
 	mongoDB = client.Database(databaseName)
-	mux.Unlock()
 	return mongoDB, nil
 }
 
@@ -92,7 +91,7 @@ func (repo *MongoDBStorage) Get(documentID string) (models.AdNetworkList, error)
 
 	collection := repo.db.Collection(collectionName)
 
-	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
 		log.Printf("ERROR: Failed to get document by ID %s, Mongo error: %s.", documentID, err.Error())
 		return result, fmt.Errorf("Document with ID %s does not exists", documentID)
@@ -106,7 +105,7 @@ func (repo *MongoDBStorage) Upsert(data models.AdNetworkList) error {
 	filter := bson.D{primitive.E{Key: "_id", Value: data.ID}}
 	opts := options.Replace().SetUpsert(true)
 	collection := repo.db.Collection(collectionName)
-	result, err := collection.ReplaceOne(context.TODO(), filter, data, opts)
+	result, err := collection.ReplaceOne(context.Background(), filter, data, opts)
 	if err != nil {
 		log.Printf("ERROR: Failed to update document by ID %s, Mongo error: %s", data.ID, err.Error())
 		return fmt.Errorf("AdNetworkList with ID %s was not upserted", data.ID)
@@ -125,6 +124,6 @@ func (repo *MongoDBStorage) Upsert(data models.AdNetworkList) error {
 
 // Ping checks if MongoDB is up and runing
 func (repo *MongoDBStorage) Ping() error {
-	err := repo.db.Client().Ping(context.TODO(), nil)
+	err := repo.db.Client().Ping(context.Background(), nil)
 	return err
 }

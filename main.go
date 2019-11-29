@@ -43,9 +43,10 @@ func main() {
 	// Initialize service storage
 	switch confStorageType {
 	case "MongoDB":
-		dbStorage, _ = storage.NewMongoDBStorage()
-	case "CloudSQL":
-		log.Fatal("Not implemented")
+		dbStorage = storage.NewMongoDBStorage()
+	case "CloudStorage":
+		googleProjectID := utils.GetEnv("GOOGLE_PROJECT_ID", "provide in configuration file")
+		dbStorage = storage.NewGoogleCloudStorage(googleProjectID)
 	}
 
 	// Check if storage is up and running
