@@ -38,8 +38,9 @@ func MakePutAdNetworkListingEndpoint(s Service) func(w http.ResponseWriter, r *h
 
 		upsertErr := s.UpsertAdNetworkList(newAdNetworkList)
 		if upsertErr != nil {
-			w.WriteHeader(http.StatusNotModified)
-			w.Write([]byte(`{"errorMessage": "Ad network list was not updated."}`))
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(`{"errorMessage": "Failed to update list of AdNetwork items."}`))
+			return
 		}
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte(`{"message": "Ad network list successfully updated."}`))

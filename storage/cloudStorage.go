@@ -87,7 +87,7 @@ func (s *CloudStorage) Upsert(data models.AdNetworkList) error {
 
 		// In a transaction load each task, set done to true and store.
 		_, err := s.client.RunInTransaction(ctx, func(tx *datastore.Transaction) error {
-			if _, err := tx.Put(idKey, data); err != nil {
+			if _, err := tx.Put(idKey, &data); err != nil {
 				return err
 			}
 			return err
@@ -97,7 +97,7 @@ func (s *CloudStorage) Upsert(data models.AdNetworkList) error {
 
 	// Document does not exists, do insert
 	key := datastore.IncompleteKey(kindName, nil)
-	_, insertionErr := s.client.Put(ctx, key, data)
+	_, insertionErr := s.client.Put(ctx, key, &data)
 
 	return insertionErr
 }

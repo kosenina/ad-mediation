@@ -1,6 +1,8 @@
 package adding
 
 import (
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/kosenina/ad-mediation/models"
@@ -33,6 +35,8 @@ func (s *service) UpsertAdNetworkList(data models.AdNetworkList) error {
 	result := s.repo.Upsert(data)
 	if result == nil {
 		s.cache.Remove("obj:adNetworkList")
+	} else {
+		log.Printf(fmt.Sprintf("ERROR: Failed to upsert ad network list with ID: %s, internal error: %v", data.ID, result))
 	}
 	return result
 }
