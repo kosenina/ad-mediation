@@ -16,6 +16,8 @@ type Handler func(c *gin.Context)
 // MakeGetAdNetworkListingEndpoint creates a handler for GET /adNetworkList requests
 func MakeGetAdNetworkListingEndpoint(s Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
+
 		// Parse request parameter
 		var documentID string
 		queryDate := c.DefaultQuery("date", "")
@@ -27,7 +29,9 @@ func MakeGetAdNetworkListingEndpoint(s Service) func(c *gin.Context) {
 
 			if err != nil {
 				log.Printf(fmt.Sprintf("ERROR: Failed to parse provided query date parameter: %s", queryDate))
-				c.AbortWithStatus(http.StatusBadRequest)
+				c.AbortWithStatusJSON(
+					http.StatusBadRequest,
+					gin.H{"message": "Failed to parse provided date parameted, please use the right format: year-month-day (example: 2019-01-05)."})
 				return
 			}
 			documentID = utils.GetAdNetworkListID(t)
@@ -36,11 +40,10 @@ func MakeGetAdNetworkListingEndpoint(s Service) func(c *gin.Context) {
 		// Get adNetworkList and return JSON object
 		list, err := s.GetAdNetworkList(documentID)
 		if err != nil {
-			c.AbortWithStatus(http.StatusNotFound)
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "Requested document does not exists."})
 			return
 		}
 
-		c.Header("Content-Type", "application/json")
 		c.JSON(http.StatusOK, &list)
 	}
 }
