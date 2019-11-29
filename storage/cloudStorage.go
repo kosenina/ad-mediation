@@ -55,7 +55,7 @@ func (s *CloudStorage) Get(documentID string) (models.AdNetworkList, error) {
 	var result models.AdNetworkList
 
 	// Create a query to fetch all Task entities, ordered by "created".
-	query := datastore.NewQuery(kindName).Filter("id", documentID)
+	query := datastore.NewQuery(kindName).Filter("ID =", documentID)
 	keys, err := s.client.GetAll(context.Background(), query, &results)
 	if err != nil {
 		log.Printf("ERROR: Failed to query document by ID %s, error: %v", documentID, err)
@@ -74,7 +74,7 @@ func (s *CloudStorage) Upsert(data models.AdNetworkList) error {
 	ctx := context.Background()
 
 	// Create a query to fetch document by ID.
-	query := datastore.NewQuery(kindName).Filter("id", data.ID)
+	query := datastore.NewQuery(kindName).Filter("ID =", data.ID)
 	keys, err := s.client.GetAll(ctx, query, &results)
 	if err != nil {
 		log.Printf("ERROR: Failed to upsert document by ID %s, error: %v", data.ID, err)
