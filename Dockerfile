@@ -16,7 +16,9 @@ ARG LOG_DIR=/app/logs
 RUN mkdir -p ${LOG_DIR}
 
 # Environment Variables
-ENV LOG_FILE_LOCATION=${LOG_DIR}/app.log 
+ENV LOG_FILE_LOCATION=${LOG_DIR}/app.log
+ENV PERSISTENT_STORAGE="CloudStorage"
+ENV GOOGLE_PROJECT_ID="admitigation"
 
 # Copy go mod and sum files
 COPY go.mod go.sum ./
