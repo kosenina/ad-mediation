@@ -14,24 +14,8 @@ services:
     ports:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: unless-stopped
-    depends_on: 
-      - mongo # This service depends on mongo. Start that first.
     environment: # Pass environment variables to the service
       PERSISTENT_STORAGE: CloudStorage
       GOOGLE_PROJECT_ID: 00b4903a9720f3ed09bbb32985ca0da141255cf993574eed2fbbad2d31faf3c5
-    networks: # Networks to join (Services on the same network can communicate with each other using their name)
-      - backend
     volumes:
       - "~/Development/logs/ad-mediation:/app/logs"
-
-  # Mongo Service   
-  mongo:
-    image: 'mongo:latest'
-    container_name: 'mongo'
-    ports:
-      - '27017:27017'
-    networks:
-      - backend
-
-networks:
-  backend:  
