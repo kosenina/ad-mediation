@@ -1,26 +1,54 @@
-# Ad network mediation
+# Ad Mediation
 
-This repository contains _service_, written in `go`, to provide list of _ad networks_ using `REST API`.
+This repository contains Ad Mediation _service_, written in `go`, which provides list of _ad networks_ through `REST API`.
 
 The service has two functionalities:
 
 1. Retrieve list of ad networks
 2. Update list of ad networks
 
-In detail description of the two functionalities is available down bellow.
+Idea is to design and build backend system to provide ad network list to the mobile devices. Data batch processing service will update the list accordingly and Ad Mediation service will provide the latest and newest data to the mobile devices.
 
-TODO: napiši kater storage lahko uporabljaš, skica
+Image below shows how will system operate:
+![Overview](readme-files/adMediation-Overview.png?raw=true "Designed backend system")
+
+From the picture we can tell that system must be designed in a scalable manner to handle all the request from the mobile devices. Final solution will be deployed to the Google Cloud, with that in mind, we need to use appropriate tools to enable easy and efficient deployment.
+
+## System Design
+
+I have designed the system using Domain Driven Design approach, where the solution consists of the following building block: storage, object cache, services and endpoint and finally main service to run the whole app.
+
+Sketch of the described system is shown below:
+![Design](readme-files/adMediation-Implementation.png?raw=true "Designed backend system")
+
+### API endpoints
+
+API has three endpoints:
+
+1. GET /api/v1/adNetworkList
+2. PUT /api/v1/adNetworkList
+3. GET /swagger/index.html
+
+First two endpoints provides the desired functionality of the service, while last one provides documentation page where developers can try the service functionality.
+
+### Services and storage
+
+Requests to the first two endpoint in previous section are processed by the adding or listing service. Those two services takes care that data is persisted and cached to enable fast data access and cost savings. 
+
+Object cache provides in memory cache where all the objects are cached with time to live of 5 minutes. This means that cached objects will be removed from cache in 5 minutes from adding. If some document is updated we also delete the cached previously cached object to prevent serving stale data. Off course we need to be aware that this cache is per service and when we run the application in multiple nodes, some nodes will serve stale data. We need to be careful and configure TTL time, if we want to prevent serving stale data we need to implement distributed cache.
+
+Persistent storage layer offers two implementations: MongoDB and Cloud Storage. I have implemented MongoDB storage for the sake of development and debugging the application. For the production environment is desirable to use Cloud Storage.
 
 ## Running and Deployment
 
 You can run this application without or using Docker.
 
-Also you need to choose what storage you want to use to persist data. 
-Using configuration you can switch between MongoDB or Google Cloud Firestore.
+Also you need to choose what storage you want to use to persist data.
+Using configuration you can switch between MongoDB or Google Cloud Storage.
 
 ### Without Docker
 
-To run the application on your PC you need to have installed `go SDK`, where `MongoDB` is optional (if you choose to use GCS Firestore).
+To run the application on your PC without Docker you need to have installed `go SDK` and `MongoDB`.
 
 Once all the requirements are installed execute the following commands to run the service:
 
@@ -30,13 +58,13 @@ go build
 ./ad-mediation
 ```
 
-The first command specified to use Go modules for dependency management, where the second one builds the project and the last one runs the builded executable.
+The first command specify to use Go modules for dependency management, where the second one builds the project and the last one runs the builded executable.
 
-Now the application is up and running.
+Now the application is up and running and you can try it using Swagger on URL http://localhost:8080/swagger/index.html.
 
 ### Using Docker
 
-If you choose to use docker I recommend you to configure the application to use GCS Firestore, otherwise use docker compose, because it is more convenient to prepare mongoDB dependency.
+If you choose to use docker, I recommend you to configure the application to use Cloud Storage, otherwise use docker compose, because it is more convenient as to defining MongoDB configuration.
 
 To use docker, follow the instructions bellow:
 
@@ -66,7 +94,7 @@ docker container ls
 
 ### Using Docker compose
 
-If you don't want to install dependencies (go, mongoDB) than Docker compose is the right choice.
+If you don't want to install dependencies (Go, MongoDB) than Docker compose is the right choice.
 You need to have installed Docker and docker-compose, than you need to execute the following command to run the service:
 
 ```bash
